@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Clone Repository') {
+            steps {
+                git credentialsId: 'sandeep', url: 'https://github.com/chevvusandeep12/Dockerizing-Jenkins-Pipeline.git'
+            }
+        }
+        stage('Dockerbuild') {
+            steps {
+                sh '''
+                docker build -t webserver:1.0 .
+                docker tag webserver:1.0 chevvusandeep/dockerizing_jenkins_pipeline:webserver
+                echo "Sandy@123" | docker login -u chevvusandeep12@gmail.com --password-stdin
+                docker push chevvusandeep/dockerizing_jenkins_pipeline:webserver
+                docker run -d -p 80:81 --name httpserver chevvusandeep/dockerizing_jenkins_pipeline:webserver
+                '''
+            }
+        }
+    }
+}
